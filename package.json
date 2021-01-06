@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.ts",
-    "test": "jest --forceExit",
-    "tsc":"tsc"
+    "build": "tsc",
+    "test": "jest --forceExit"
   },
   "keywords": [],
   "author": "",
