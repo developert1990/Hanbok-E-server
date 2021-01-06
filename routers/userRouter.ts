@@ -20,9 +20,11 @@ userRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) 
 // user signin 하는 API
 userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Response) => {
     const user = await User.findOne({ email: req.body.email });
+    console.log('user: ', user)
     const typedUser = user as userFromDB;
     if (user) {
-        if (bcrypt.compareSync(req.body.password, typedUser.password)) {
+        // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
+        if (bcrypt.compare(req.body.password, typedUser.password)) {
             res.send({
                 _id: typedUser._id,
                 name: typedUser.name,
