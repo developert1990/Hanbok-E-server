@@ -20,7 +20,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }} # git hub 에 해당 리파지토리에 setting에서 설정할 수 있다.
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # git hub 에 해당 리파지토리에 setting에서 설정할 수 있다. 이거 두개 까먹지 말것...
           password: ${{ secrets.DOCKERHUB_TOKEN }} # 위와 같이 설정을 해주는데 token은 docker hub에서 받을 수 있다.
 
       - name: Building docker image
