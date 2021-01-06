@@ -3,8 +3,8 @@ name: hanbok-server
 #  master branch로 pull_request 할때 실행되도록 한다.
 on: push
 
-  jobs:
-    build-and-test: # 내가 알아서 정할 수 있다.
+jobs:
+  build-and-test: # 내가 알아서 정할 수 있다.
 
     runs-on: ubuntu-latest
 
