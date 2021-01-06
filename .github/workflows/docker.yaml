@@ -11,7 +11,7 @@ jobs:
     steps:
       #  앞서 build-and-test 단계에서 해줬지만 한번더 새로 checkout을 해야한다.
       - name: Checking out repository code
-      - uses: actions/checkout@v2 # git clone 하는 action 예를 들어서 npm 에서 install 하는거랑 비슷
+        uses: actions/checkout@v2 # git clone 하는 action 예를 들어서 npm 에서 install 하는거랑 비슷
       
       # https://github.com/marketplace/actions/build-and-push-docker-images 그대로 복붙하면됨
       - name: Set up Docker Buildx
