@@ -20,7 +20,7 @@ jobs:
           # npm install / 패키지이름 github action에서 사용하기 때문에 actions/ 
         uses: actions/setup-node@v1
         with:
-        node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
 
       - run: npm install
     # - run: npm run build --if-present
