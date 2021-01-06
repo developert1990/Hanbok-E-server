@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Docker yaml file
 # 이 on 행동을 했을 경우에 아래 jobs trigger 가 시작된다.
 on:
   push:
