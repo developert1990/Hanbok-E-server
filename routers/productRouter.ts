@@ -4,7 +4,6 @@ import { isAuth, isAdmin } from './../utils';
 import expressAsyncHandler from 'express-async-handler';
 import express, { Request, Response } from 'express';
 import { Product, Review } from '../models/productModel';
-import { data } from '../data';
 
 const productRouter = express.Router();
 
@@ -86,11 +85,11 @@ productRouter.get('/list/:name/:category/:priceLessThan/:sortBy', expressAsyncHa
 
 
 // 저장
-productRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) => {
-    await Product.remove({}); //이걸 이렇게 앞에다 주면 Product Collection(table)에 잇는 데이터가 모두 삭제된다. 그 다음 아래가 실행됨
-    const createdProducts = await Product.insertMany(data.products);
-    res.send({ createdProducts });
-}));
+// productRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) => {
+//     await Product.remove({}); //이걸 이렇게 앞에다 주면 Product Collection(table)에 잇는 데이터가 모두 삭제된다. 그 다음 아래가 실행됨
+//     const createdProducts = await Product.insertMany(data.products);
+//     res.send({ createdProducts });
+// }));
 
 
 // 찾기

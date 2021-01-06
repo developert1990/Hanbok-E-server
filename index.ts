@@ -27,6 +27,11 @@ mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/E-commerce', {
 
 // 제품 사진 upload
 app.use('/api/uploads', uploadRouter);
+// 제품 사진 upload
+app.use('/api/asdf', uploadRouter);
+// 제품 사진 upload
+app.use('/api/asdf', uploadRouter);
+
 
 // 유저 등록하는 라우터를 연결
 app.use('/api/users/', userRouter);
@@ -60,6 +65,6 @@ app.use((err: ErrorEvent, req: Request, res: Response, next: NextFunction) => {
     res.status(500).send({ message: err.message })
 })
 
-app.listen(process.env.PORT || 9002, () => {
+export const server = app.listen(process.env.PORT || 9002, () => {
     console.log(`Server is running at ${PORT}`)
 });
