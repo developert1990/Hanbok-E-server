@@ -1,1 +1,1 @@
-web: npm run tsc && node build/index.js
+web: npm start
