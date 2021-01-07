@@ -12,10 +12,10 @@ dotenv.config();
 
 console.log(process.env);
 
-// if (!process.env.MONGODB_URL) {
-//     console.error('MONGODB_URL is not set');
-//     process.exit(1);
-// }
+if (!process.env.MONGODB_URL) {
+    console.error('MONGODB_URL is not set');
+    process.exit(1);
+}
 
 const app = express();
 app.use(cors());
@@ -32,7 +32,7 @@ const PORT = 9002;
 // });
 
 // mongoDB Atlas <==> heroku
-mongoose.connect(process.env.MONGODB_URL || 'mongodb+srv://sangmeanhong:TItoAU6ebHt0UeYN@hong-mongo.0savm.mongodb.net/HANBOK?retryWrites=true&w=majority', {
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
