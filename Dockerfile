@@ -9,7 +9,6 @@ RUN npm install
 # RUN npm install tsc -g
 COPY . ./
 # 나머지 모든 디렉토리 복사
-RUN npm run show-version
 # npm test, npm start, npm restart, npm stop 얘들만 run 없이 가능하고 나머지 script는 모두 run xxx 로 명령어를 실행해야한다.
 RUN npm run build
 EXPOSE 9002

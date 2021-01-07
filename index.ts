@@ -10,6 +10,11 @@ import emailRouter from './routers/sendEmailRouter';
 
 dotenv.config();
 
+if (!process.env.MONGODB_URL) {
+    console.error('MONGODB_URL is not set');
+    process.exit(1);
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -18,7 +23,14 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const PORT = 9002;
-mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/E-commerce', {
+// mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/E-commerce', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     useCreateIndex: true,
+// });
+
+// mongoDB Atlas <==> heroku
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
