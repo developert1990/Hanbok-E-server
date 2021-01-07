@@ -31,7 +31,7 @@ jobs:
           GOOGLE_API_KEY: ${{secrets.GOOGLE_API_KEY}}
           EMAIL: ${{secrets.EMAIL}}
           EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
-          MONGODB_URL: ${{secrets.MONGODB_URL}}
+          MONGODB_URL: "mongodb+srv://sangmeanhong:TItoAU6ebHt0UeYN@hong-mongo.0savm.mongodb.net/HANBOK?retryWrites=true&w=majority"
         # run: |
         #   chmod +x ./scripts/set-env.sh
         #   ./scripts/set-env.sh
