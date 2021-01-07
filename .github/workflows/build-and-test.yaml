@@ -1,13 +1,10 @@
 # 이 name은 내가 정할 수 있는 이름이다.
 name: hanbok-server
 #  master branch로 pull_request 할때 실행되도록 한다.
-on: 
-  pull_request:
-    branches:
-    - master
+on: push
 
-  jobs:
-    build-and-test: # 내가 알아서 정할 수 있다.
+jobs:
+  build-and-test: # 내가 알아서 정할 수 있다.
 
     runs-on: ubuntu-latest
 
@@ -23,7 +20,7 @@ on:
           # npm install / 패키지이름 github action에서 사용하기 때문에 actions/ 
         uses: actions/setup-node@v1
         with:
-        node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
 
       - run: npm install
     # - run: npm run build --if-present

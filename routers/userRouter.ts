@@ -1,6 +1,5 @@
 import { isAuth, isAdmin } from './../utils';
-import { data } from './../data';
-import express, { Request, response, Response } from 'express';
+import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel';
 import expressAsyncHandler from 'express-async-handler'; // express에서 비동기식으로 에러 헨들링을 하기 위한 라이브러리 이다.
@@ -10,11 +9,11 @@ import { generateToken } from '../utils';
 const userRouter = express.Router();
 
 // 바로 url 로 유저 생성 admin 생성하면된다
-userRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) => {
-    const createdUsers = await User.insertMany(data.users);
-    res.send({ createdUsers });
+// userRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) => {
+//     const createdUsers = await User.insertMany(data.users);
+//     res.send({ createdUsers });
 
-}));
+// }));
 
 
 // user signin 하는 API
