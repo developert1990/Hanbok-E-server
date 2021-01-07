@@ -24,7 +24,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }} # 위와 같이 설정을 해주는데 token은 docker hub에서 받을 수 있다.
 
       - name: Setting environment variables
-        run: ./scripts/set-env.sh
+        run: |
+          chmod +x ./scripts/set-env.sh
+          ./scripts/set-env.sh
         env:
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           PORT: ${{secrets.PORT}}
