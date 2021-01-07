@@ -1,4 +1,4 @@
-name: Docker yaml file
+name: Build docker image and publish on docker hub
 # 이 on 행동을 했을 경우에 아래 jobs trigger 가 시작된다.
 # master에 push 가 되면 merge가 되면서 push 가 된다.
 on:

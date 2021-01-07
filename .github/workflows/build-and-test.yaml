@@ -1,5 +1,5 @@
 # 이 name은 내가 정할 수 있는 이름이다.
-name: hanbok-server
+name: Build and Test hanbok-server
 # push하거나 수동으로 trigger할때 해당 파일 실행
 on: [push, workflow_dispatch]
 
