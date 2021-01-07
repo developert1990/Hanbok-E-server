@@ -26,6 +26,8 @@ jobs:
         run: |
           chmod +x ./scripts/set-env.sh
           ./scripts/set-env.sh
+          printenv
+          cat .env
         env:
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           PORT: ${{secrets.PORT}}
