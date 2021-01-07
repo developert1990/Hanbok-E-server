@@ -25,6 +25,17 @@ on:
         with:
         node-version: ${{ matrix.node-version }}
 
+      - name: Setting environment variables
+        run: ./scripts/set-env.sh
+        env:
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
+          PORT: ${{secrets.PORT}}
+          PAYPAL_CLIENT_ID: ${{secrets.PAYPAL_CLIENT_ID}}
+          GOOGLE_API_KEY: ${{secrets.GOOGLE_API_KEY}}
+          EMAIL: ${{secrets.EMAIL}}
+          EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
+          MONGODB_URL: ${{secrets.MONGODB_URL}}
+
       - run: npm install
     # - run: npm run build --if-present
       - run: npm test

@@ -24,14 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }} # 위와 같이 설정을 해주는데 token은 docker hub에서 받을 수 있다.
 
       - name: Setting environment variables
-        run: |
-          echo $JWT_SECRET > .env
-          echo $PORT >> .env
-          echo $PAYPAL_CLIENT_ID >> .env
-          echo $GOOGLE_API_KEY >> .env
-          echo $EMAIL >> .env
-          echo $EMAIL_PASSWORD >> .env
-          echo $MONGODB_URL >> .env
+        run: ./scripts/set-env.sh
         env:
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           PORT: ${{secrets.PORT}}
