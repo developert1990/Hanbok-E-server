@@ -29,6 +29,7 @@ jobs:
 
       - name: Log into ec2 and deploy
         run: |
-          ssh aws 'docker run -d -p 9002:9002 $IMAGE:$(git rev-parse --short HEAD)'
+          export IMAGE_NAME=$IMAGE:$(git rev-parse --short HEAD)
+          ssh aws env IMAGE=$IMAGE_NAME docker run -d -p 9002:9002 $IMAGE
         env:
           IMAGE: ${{ secrets.IMAGE }}
