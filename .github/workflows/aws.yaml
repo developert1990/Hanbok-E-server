@@ -25,23 +25,23 @@ jobs:
           chmod 600 ~/.ssh/ec2.key
           cat >> ~/.ssh/config << END
           Host aws
-            Hostname $SSH_HOST
+            Hostname 100.25.140.61
             user ubuntu
             IdentityFile ~/.ssh/ec2.key
             StrictHostKeyChecking no
           END
           cat ~/.ssh/config
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }} # 이건  local에 있는 aws_ec2_hong.pem 파일의 안에 내용값이다. 아마존ec2에서 받은 private ssh 키 값
+          SSH_HOST: ${{ secrets.SSH_HOST }} # ec2에 public PIv4 address 이다.
 
       - name: Log into ec2 and deploy
           # git ubuntu 에 환경변수를 직접 박는거 ec2 로 넘겨줄 환경변수를 선언한다.
           # ssh aws 다음 env 
         run: |
-          export IMAGE_NAME=magicq6265/hanbok-server:${{ github.event.inputs.gitSha }}
+          export IMAGE_NAME=$IMAGE:${{ github.event.inputs.gitSha }}
           export CONTAINER_NAME=${{github.event.inputs.containerName}}
           ssh aws docker run --name $CONTAINER_NAME -d -p 9002:9002 $IMAGE_NAME
-        # env:
-        #   IMAGE: magicq6265/hanbok-server
+        env:
+          IMAGE: magicq6265/hanbok-server
           # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
