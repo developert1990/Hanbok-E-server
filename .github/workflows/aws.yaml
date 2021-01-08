@@ -33,6 +33,6 @@ jobs:
         run: |
           export IMAGE_NAME=magicq6265/hanbok-server:$(git rev-parse --short HEAD)
           ssh aws docker run -d -p 9002:9002 $IMAGE_NAME
-        env:
-          IMAGE: ${{ secrets.IMAGE }}
+        # env:
+        #   IMAGE: ${{ secrets.IMAGE }}
           # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
