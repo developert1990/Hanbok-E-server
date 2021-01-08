@@ -9,12 +9,13 @@ jobs:
       - name: checkout code from git (git clone)
         uses: actions/checkout@v2
 
-      - name: Setting environment variables
-        run: |
-          chmod +x ./scripts/set-env.sh
-          ./scripts/set-env.sh
-          printenv
-          cat .env
+
+      - name: deploy to heroku
+        uses: akhileshns/heroku-deploy@v3.8.8 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
         env:
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           PORT: ${{secrets.PORT}}
@@ -23,13 +24,6 @@ jobs:
           EMAIL: ${{secrets.EMAIL}}
           EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
           MONGODB_URL: ${{secrets.MONGODB_URL}}
-
-      - name: deploy to heroku
-        uses: akhileshns/heroku-deploy@v3.8.8 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
 
       
 
