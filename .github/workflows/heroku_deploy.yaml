@@ -6,9 +6,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.8.8 # This is the action
+      - name: checkout code from git (git clone)
+        uses: actions/checkout@v2
+
+      - name: Setting environment variables
+        run: |
+          chmod +x ./scripts/set-env.sh
+          ./scripts/set-env.sh
+          printenv
+          cat .env
+        env:
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
+          PORT: ${{secrets.PORT}}
+          PAYPAL_CLIENT_ID: ${{secrets.PAYPAL_CLIENT_ID}}
+          GOOGLE_API_KEY: ${{secrets.GOOGLE_API_KEY}}
+          EMAIL: ${{secrets.EMAIL}}
+          EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
+          MONGODB_URL: ${{secrets.MONGODB_URL}}
+
+      - name: deploy to heroku
+        uses: akhileshns/heroku-deploy@v3.8.8 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
-          heroku_email: ${{secrets.HEROKU_EMAIL}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+
+      
+
+      
