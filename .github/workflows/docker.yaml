@@ -1,11 +1,12 @@
 name: Build docker image and publish on docker hub
 # 이 on 행동을 했을 경우에 아래 jobs trigger 가 시작된다.
 # master에 push 가 되면 merge가 되면서 push 가 된다.
-on:
-  workflow_dispatch:
-  push:
-    branches:
-    - master
+on: workflow_dispatch
+  # 이렇게 하면 선택해서 돌릴수도 있고 master로 push를 할때 자동으로 돌릴 수 있음
+  # workflow_dispatch:
+  # push:
+  #   branches:
+  #   - master
 
 jobs:
   docker-build-and-publish:
