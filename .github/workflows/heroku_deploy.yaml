@@ -16,6 +16,8 @@ jobs:
           printenv
           cat .env
         env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           JWT_SECRET: ${{secrets.JWT_SECRET}}
           PORT: ${{secrets.PORT}}
           PAYPAL_CLIENT_ID: ${{secrets.PAYPAL_CLIENT_ID}}
