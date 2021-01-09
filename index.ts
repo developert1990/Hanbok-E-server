@@ -10,7 +10,7 @@ import emailRouter from './routers/sendEmailRouter';
 
 dotenv.config();
 
-console.log(process.env);
+// console.log(process.env);
 
 if (!process.env.MONGODB_URL) {
     console.error('MONGODB_URL is not set');
