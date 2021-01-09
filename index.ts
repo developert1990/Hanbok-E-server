@@ -20,6 +20,7 @@ if (!process.env.MONGODB_URL) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 // 이렇게 미들웨어로 public 폴더를 정적으로 만들어줘야 외부에서 로컬호스트의 이 public 폴더로 접속을 할 수가 있다.
 app.use(express.static("public"));

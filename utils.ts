@@ -53,12 +53,16 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
 // amin계정으로 접속했을 경우에 admin관리를 할 수 있는 페이지에서 동작하는 API를 verify 해주기 위한 middleware
 export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
     // console.log("admin인지 확인하러 들어옴")
-    // console.log('1: ', req.user)
-    // console.log('2: ', req.body)
+    // console.log('1: ', req)
+    console.log('2: ', req.body)
     // console.log('3: ', req.params)
+    console.log('req.params: ', req.params)
+    console.log('폼데이타의 유저인포 : ', req.body.formData)
     if (req.user && req.params.isAdmin) {
         next();
     } else if (req.user && req.body.userInfo.isAdmin) {
+        next();
+    } else if (req.user && req.body.formData.userInfo) {
         next();
     } else {
         res.status(401).send({ message: 'Invalid Admin Token' });

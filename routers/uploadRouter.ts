@@ -47,11 +47,11 @@ const storage: multer.StorageEngine = multerS3({
 const upload = multer({ storage }).single('image');    // productEditScreen 에서 bodyFormdata 의 file 이름을 image라고 해줘서
 
 
-uploadRouter.post('/', isAuth, (req: Request, res: Response) => {
+uploadRouter.post('/', (req: Request, res: Response) => {
     console.log('upload 포스트로 들어옴==>   ')
     upload(req, res, (err: any) => {
         if (err) { return res.status(404).send({ message: 'Can not upload image' }) };
-        // console.log('req.file:___', req.file)
+        console.log('req.file:___', req.file)
         return res.send(`${req.file.filename}`)
     })
 

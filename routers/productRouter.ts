@@ -5,6 +5,7 @@ import expressAsyncHandler from 'express-async-handler';
 import express, { Request, Response } from 'express';
 import { Product, Review } from '../models/productModel';
 import { data } from '../data';
+import { upload } from '../middlewares/s3Upload';
 
 const productRouter = express.Router();
 
@@ -106,22 +107,36 @@ productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response
 
 
 
-// product 새로 추가
-productRouter.post('/', isAuth, isAdmin, expressAsyncHandler(async (req, res) => {
+// product 새로 추가    여기 isAdmin 로직 전체적으로 바꿔서 서버에서 isAdmin을 판별할 수있게 해야한다. 프론트에 로컬스토리지에 넣으면 자바스크립트로 변환이 가능하기때문에 위험하다.
+productRouter.post('/', isAuth, upload, expressAsyncHandler(async (req, res) => {
     console.log("admin확인 되서 들어옴")
+    //s3 upload -> get URL
+    console.log(req.file);
+    console.log('req.body: ', req.body)
+    console.log("폼: ", req.body.formData);
+    // const { createProduct } = JSON.parse(req.body);
+    const { createProduct } = req.body;
+    const { name, price, category, brand, countInStock, description } = JSON.parse(createProduct);
+
     const product = new Product({
-        name: req.body.createProduct.name,
-        image: req.body.createProduct.image,
-        price: req.body.createProduct.price,
-        category: req.body.createProduct.category,
-        brand: req.body.createProduct.brand,
-        countInStock: req.body.createProduct.countInStock,
+        name,
+        // @ts-ignore
+        image: req.file.location, // s3 URL
+        price,
+        category,
+        brand,
+        countInStock,
         rating: 0,
         numReviews: 0,
-        description: req.body.createProduct.description,
+        description,
     });
-    const createdProduct = await product.save();
-    res.send({ message: 'Product Created', product: createdProduct });
+    try {
+        const createdProduct = await product.save();
+        res.send({ message: 'Product Created', product: createdProduct });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message);
+    }
 }));
 
 
