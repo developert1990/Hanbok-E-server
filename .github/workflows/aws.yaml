@@ -25,7 +25,7 @@ jobs:
           chmod 600 ~/.ssh/ec2.key
           cat >> ~/.ssh/config << END
           Host aws
-            Hostname $SSH_KEY
+            Hostname $SSH_HOST
             user ubuntu
             IdentityFile ~/.ssh/ec2.key
             StrictHostKeyChecking no
