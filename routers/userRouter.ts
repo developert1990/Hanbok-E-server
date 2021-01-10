@@ -24,6 +24,12 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     if (user) {
         // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
         if (bcrypt.compare(req.body.password, typedUser.password)) {
+            const token = generateToken(typedUser);
+            if (token) {
+                res.cookie("hanbok_my_token", token, { httpOnly: true });
+            } else {
+                res.status(404).send("Invalid token..");
+            }
             res.send({
                 _id: typedUser._id,
                 name: typedUser.name,
