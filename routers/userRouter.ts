@@ -1,3 +1,4 @@
+import { CustomRequestExtendsUser } from './../types.d';
 import { isAuth, isAdmin } from './../utils';
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
@@ -23,25 +24,40 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     const typedUser = user as userFromDB;
     if (user) {
         // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
-        if (bcrypt.compare(req.body.password, typedUser.password)) {
+        const checkPassword = await bcrypt.compare(req.body.password, typedUser.password)
+        if (checkPassword) {
             const token = generateToken(typedUser);
             if (token) {
-                res.cookie("hanbok_my_token", token, { httpOnly: true });
+                console.log("토큰 받아서 쿠키에 너으러 옴")
+                res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
             } else {
                 res.status(404).send("Invalid token..");
             }
             res.send({
-                _id: typedUser._id,
                 name: typedUser.name,
                 email: typedUser.email,
-                isAdmin: typedUser.isAdmin,
-                token: generateToken(typedUser),
             });
             return;
         }
     }
     res.status(401).send({ message: 'Invalid email or password' });
 }));
+
+// check isAdmin
+userRouter.get('/checkAdmin', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+    res.status(200).send({ message: "Amin user verified" })
+
+}))
+
+
+// // user signout
+userRouter.get('/signout', expressAsyncHandler(async (req: Request, res: Response) => {
+    console.log("signout 하러 옴")
+    res.clearCookie("hanbok_my_token")
+    res.status(200).send({ message: "Successfully logged out" })
+}))
+
+
 
 // user register 하는 API
 userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Response) => {
@@ -54,18 +70,25 @@ userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Respo
     // 그 유저의 정보를 db에 저장한다.
     const createdUser = await user.save();
     const typedUser = createdUser as userFromDB;
+    const token = generateToken(typedUser);
+    if (token) {
+        console.log("토큰 받아서 쿠키에 너으러 옴")
+        res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+    } else {
+        res.status(404).send("Invalid token..");
+    }
     res.send({
-        _id: typedUser._id,
         name: typedUser.name,
         email: typedUser.email,
-        isAdmin: typedUser.isAdmin,
-        token: generateToken(typedUser),
     });
+    return;
 }));
 
 // user profile update 하는 API
-userRouter.put('/:id', isAuth, expressAsyncHandler(async (req: Request, res: Response) => {
-    const user = await User.findById(req.params.id);
+userRouter.put('/update', isAuth, expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+    console.log('req.user._id 업데이트 하는곳 들어옴:  ', req.user)
+    const userId = req.user;
+    const user = await User.findById(userId);
     const typedUser = user as userFromDB;
     if (user) {
         typedUser.name = req.body.name || typedUser.name;
@@ -75,14 +98,18 @@ userRouter.put('/:id', isAuth, expressAsyncHandler(async (req: Request, res: Res
         }
 
         const updatedUser = await typedUser.save();
-        const typedUpdatedUser = updatedUser as userFromDB;
+        const token = generateToken(updatedUser);
+        if (token) {
+            console.log("토큰 받아서 쿠키에 너으러 옴")
+            res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+        } else {
+            res.status(404).send("Invalid token..");
+        }
         res.send({
-            _id: typedUser._id,
-            name: typedUser.name,
-            email: typedUser.email,
-            isAdmin: typedUser.isAdmin,
-            token: generateToken(typedUpdatedUser),
+            name: updatedUser.name,
+            email: updatedUser.email,
         });
+        return;
     } else {
         res.status(404).send({ message: 'User Not Found' });
     }
@@ -90,16 +117,15 @@ userRouter.put('/:id', isAuth, expressAsyncHandler(async (req: Request, res: Res
 
 
 
-// 모든 user data 받음
-userRouter.get('/:isAdmin/allList', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin계정으로 모든 user data 받음
+userRouter.get('/admin/allList', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const users = await User.find();
     res.send(users);
 }));
 
 
-
-// user delete API
-userRouter.delete('/:id/:isAdmin/', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin계정으로 user delete API
+userRouter.delete('/admin/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const user = await User.findById(req.params.id);
     const typedUser = user as userFromDB;
     if (user) {
@@ -116,8 +142,8 @@ userRouter.delete('/:id/:isAdmin/', isAuth, isAdmin, expressAsyncHandler(async (
 
 
 
-// user detail API
-userRouter.get('/:id/:isAdmin/detail', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin계정으로 user detail API
+userRouter.get('/admin/detail/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     console.log("유저 디테일 뽑는곳");
     const user = await User.findById(req.params.id);
     if (user) {

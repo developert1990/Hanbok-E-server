@@ -78,14 +78,6 @@ productRouter.get('/list/:name/:category/:priceLessThan/:sortBy', expressAsyncHa
 
 
 
-
-
-
-
-
-
-
-
 // 저장
 // productRouter.get('/seed', expressAsyncHandler(async (req: Request, res: Response) => {
 //     await Product.remove({}); //이걸 이렇게 앞에다 주면 Product Collection(table)에 잇는 데이터가 모두 삭제된다. 그 다음 아래가 실행됨
@@ -107,8 +99,8 @@ productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response
 
 
 
-// product 새로 추가    여기 isAdmin 로직 전체적으로 바꿔서 서버에서 isAdmin을 판별할 수있게 해야한다. 프론트에 로컬스토리지에 넣으면 자바스크립트로 변환이 가능하기때문에 위험하다.
-productRouter.post('/', isAuth, upload, expressAsyncHandler(async (req, res) => {
+// Admin 계정으로 product 새로 추가    여기 isAdmin 로직 전체적으로 바꿔서 서버에서 isAdmin을 판별할 수있게 해야한다. 프론트에 로컬스토리지에 넣으면 자바스크립트로 변환이 가능하기때문에 위험하다.
+productRouter.post('/admin/create', isAdmin, upload, expressAsyncHandler(async (req, res) => {
     console.log("admin확인 되서 들어옴")
     //s3 upload -> get URL
     console.log(req.file);
@@ -142,7 +134,7 @@ productRouter.post('/', isAuth, upload, expressAsyncHandler(async (req, res) => 
 
 
 // product update 하는 API
-productRouter.put('/:id', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+productRouter.put('/admin/update/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const productId = req.params.id;
     const product = await Product.findById(productId);
     const typedProduct = product as productsInfoType;
@@ -164,9 +156,8 @@ productRouter.put('/:id', isAuth, isAdmin, expressAsyncHandler(async (req: Reque
 }))
 
 
-// product delete 하는 API
-
-productRouter.delete('/:id', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin계정으로 product delete 하는 API
+productRouter.delete('/admin/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const product = await Product.findById(req.params.id);
     if (product) {
         const deletedProduct = await product.remove();
@@ -219,8 +210,8 @@ productRouter.post('/:productId/reviews', isAuth, expressAsyncHandler(async (req
 }))
 
 
-// delete product review
-productRouter.delete(`/:reviewId/:isAdmin/:productId/reviews`, isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin계정으로 delete product review
+productRouter.delete(`/admin/reviews/:reviewId/:productId`, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
 
     const reviewId = req.params.reviewId;
     const productId = req.params.productId;
