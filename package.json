@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/index.js",
-    "test": "jest --forceExit",
+    "test": "jest --forceExit --watch",
     "build": "tsc",
     "dev": "bash /scripts/dev.sh"
   },

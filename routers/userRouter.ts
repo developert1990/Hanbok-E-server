@@ -20,27 +20,30 @@ const userRouter = express.Router();
 // user signin 하는 API
 userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Response) => {
     const user = await User.findOne({ email: req.body.email });
-    console.log('user: ', user)
     const typedUser = user as userFromDB;
-    if (user) {
-        // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
-        const checkPassword = await bcrypt.compare(req.body.password, typedUser.password)
-        if (checkPassword) {
-            const token = generateToken(typedUser);
-            if (token) {
-                console.log("토큰 받아서 쿠키에 너으러 옴")
-                res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
-            } else {
-                res.status(404).send("Invalid token..");
-            }
-            res.send({
-                name: typedUser.name,
-                email: typedUser.email,
-            });
-            return;
-        }
+
+    if (!user) {
+        return res.status(401).send({ message: 'Invalid email' });
     }
-    res.status(401).send({ message: 'Invalid email or password' });
+
+    // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
+    const checkPassword = await bcrypt.compare(req.body.password, typedUser.password)
+    if (!checkPassword) {
+        return res.status(401).send({ message: 'Invalid password' });
+    }
+
+    const token = generateToken(typedUser);
+    if (token) {
+        console.log("토큰 받아서 쿠키에 너으러 옴")
+        res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+        res.send({
+            name: typedUser.name,
+            email: typedUser.email,
+        });
+    } else {
+        res.status(404).send("Invalid token..");
+    }
+
 }));
 
 // check isAdmin
@@ -72,7 +75,6 @@ userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Respo
     const typedUser = createdUser as userFromDB;
     const token = generateToken(typedUser);
     if (token) {
-        console.log("토큰 받아서 쿠키에 너으러 옴")
         res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
     } else {
         res.status(404).send("Invalid token..");

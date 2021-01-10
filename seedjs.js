@@ -1,11 +1,15 @@
 // import bcrypt from 'bcrypt';
 const bcrypt = require('bcrypt');
 
-const adminData = {
-    name: 'Hong',
-    email: 'admin@example.com',
-    password: bcrypt.hashSync('password', 8),
-    isAdmin: true,
+const plain = '1234';
+const hash = bcrypt.hashSync(plain, 8);
+
+console.log(plain, hash)
+
+
+const compare = async () => {
+    const isAuthenticated = await bcrypt.compare(plain, '1234');
+    console.log(isAuthenticated)
 }
 
-console.log('adminData: ', adminData)
+compare();
