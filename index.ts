@@ -17,8 +17,14 @@ if (!process.env.MONGODB_URL) {
     process.exit(1);
 }
 
+const corsOption = {
+    origin: true,
+    credentials: true,
+    preFlightContinue: true,
+}
+
 const app = express();
-app.use(cors());
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
@@ -38,6 +44,15 @@ mongoose.connect(process.env.MONGODB_URL, {
     useUnifiedTopology: true,
     useCreateIndex: true,
 });
+
+
+
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//     // console.log('req.session.id 아이디 있는지 검사: ', req.session.id)
+//     console.log('테스트: ', req)
+//     next();
+// })
+
 
 
 // 제품 사진 upload

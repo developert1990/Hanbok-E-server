@@ -27,7 +27,6 @@ const fileFilter = (req: Request, file: any, cb: any) => {
 
 
 // define storage
-
 const storage: multer.StorageEngine = multerS3({
     //@ts-ignore
     fileFilter,

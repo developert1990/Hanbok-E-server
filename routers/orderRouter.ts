@@ -7,7 +7,7 @@ import { CustomRequestExtendsUser } from '../types';
 
 const orderRouter = express.Router();
 
-// 기본 카트
+// user가 order하는(placeorder버튼 누르고 들어옴) 기본 카트
 orderRouter.post('/', isAuth, expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
     console.log("isAuth성공하고 post에 들어옴");
     console.log(req.body);
@@ -67,7 +67,7 @@ orderRouter.get('/myOrderList', isAuth, expressAsyncHandler(async (req: CustomRe
 
 
 // Admin 계정으로 user들이 order한 list를 뽑는다.
-orderRouter.get('/:isAdmin', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+orderRouter.get('/admin/orderList', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const orders = await Order.find().populate('user', 'name'); // 모든정보를 찾는다. 그리고 user부분은 참조한것에서 name을 따온다 populate를 없이 쓰면 user부분에 참조한 _id만 들어오고 populate('참조한부분') 이렇게 쓰면 객체로 값을 추출한다.
     // console.log('오더한 리스트 쫙 뽑는 data:   ', orders)
     res.send(orders);
@@ -77,7 +77,7 @@ orderRouter.get('/:isAdmin', isAuth, isAdmin, expressAsyncHandler(async (req: Re
 
 
 // Amin 계정으로 user가 order한 것을 delete한다.
-orderRouter.delete('/:id', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+orderRouter.delete('/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const order = await Order.findById(req.params.id);
     if (order) {
         const deleteOrder = await order.remove();
@@ -91,8 +91,8 @@ orderRouter.delete('/:id', isAuth, isAdmin, expressAsyncHandler(async (req: Requ
 
 
 
-// deliver 버튼 누르고 deliver 업데이트 한다
-orderRouter.put('/:id/deliver/:isAdmin', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Amin 계정으로 deliver 버튼 누르고 deliver 업데이트 한다
+orderRouter.put('/admin/deliver/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const order = await Order.findById(req.params.id);
     const typedOrder = order as OrderType;
     console.log('페이버튼 누르고 진행하는 router로 들어옴')
