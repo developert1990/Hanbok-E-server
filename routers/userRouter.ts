@@ -88,7 +88,7 @@ userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Respo
     return;
 }));
 
-// user profile update 하는 API
+// 자기 계정으로 user profile update 하는 API
 userRouter.put('/update', isAuth, expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
     console.log('req.user._id 업데이트 하는곳 들어옴:  ', req.user)
     const userId = req.user;
@@ -157,8 +157,8 @@ userRouter.get('/admin/detail/:id', isAdmin, expressAsyncHandler(async (req: Req
     }
 }))
 
-
-userRouter.put('/:id/:isAdmin/update', isAuth, isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
+// Admin 계정으로 user update
+userRouter.put('/admin/update/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const user = await User.findById(req.params.id);
     const typedUser = user as userFromDB;
     if (user) {
