@@ -6,6 +6,8 @@ import User from '../models/userModel';
 import expressAsyncHandler from 'express-async-handler'; // express에서 비동기식으로 에러 헨들링을 하기 위한 라이브러리 이다.
 import { userFromDB } from '../types';
 import { generateToken } from '../utils';
+import messages from '../constants/messages';
+import cookieName from '../constants/cookieName';
 
 const userRouter = express.Router();
 
@@ -23,25 +25,25 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     const typedUser = user as userFromDB;
 
     if (!user) {
-        return res.status(401).send({ message: 'Invalid email' });
+        return res.status(401).send({ message: messages.INVALID_EMAIL });
     }
 
     // 여기 처음에 compareSync로 동기로 작성을 하니까 test할때 에러가 발생해서 비동기로 그냥 다시 바꿔줬다.
     const checkPassword = await bcrypt.compare(req.body.password, typedUser.password)
     if (!checkPassword) {
-        return res.status(401).send({ message: 'Invalid password' });
+        return res.status(401).send({ message: messages.INVALID_PASSWORD });
     }
 
     const token = generateToken(typedUser);
     if (token) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
-        res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+        res.cookie(cookieName.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
         res.send({
             name: typedUser.name,
             email: typedUser.email,
         });
     } else {
-        res.status(404).send("Invalid token..");
+        res.status(404).send(messages.INVALID_TOKEN);
     }
 
 }));
@@ -50,13 +52,13 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 userRouter.get('/checkAdmin', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     res.status(200).send({ message: "Amin user verified" })
 
-}))
+}));
 
 
 // // user signout
 userRouter.get('/signout', expressAsyncHandler(async (req: Request, res: Response) => {
     console.log("signout 하러 옴")
-    res.clearCookie("hanbok_my_token")
+    res.clearCookie(cookieName.HANBOK_COOKIE)
     res.status(200).send({ message: "Successfully logged out" })
 }))
 
@@ -75,7 +77,7 @@ userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Respo
     const typedUser = createdUser as userFromDB;
     const token = generateToken(typedUser);
     if (token) {
-        res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+        res.cookie(cookieName.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
     } else {
         res.status(404).send("Invalid token..");
     }
@@ -103,7 +105,7 @@ userRouter.put('/update', isAuth, expressAsyncHandler(async (req: CustomRequestE
         const token = generateToken(updatedUser);
         if (token) {
             console.log("토큰 받아서 쿠키에 너으러 옴")
-            res.cookie("hanbok_my_token", token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+            res.cookie(cookieName.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
         } else {
             res.status(404).send("Invalid token..");
         }

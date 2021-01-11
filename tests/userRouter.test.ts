@@ -1,9 +1,9 @@
-import { JsonWebTokenError } from 'jsonwebtoken';
+
 import request from 'supertest';
 import { server } from '../index';
 import User from '../models/userModel';
 import bcrypt from 'bcrypt';
-
+import messages from '../constants/messages';
 
 describe('Testing API - user routes', () => {
     const password = '1234';
@@ -44,7 +44,12 @@ describe('Testing API - user routes', () => {
         const response = await request(server).post('/api/users/signin').send(user);
         expect(response.status).toBe(401);
         console.log('response.body: ', response.body)
-        expect(response.body).toHaveProperty('message', 'Invalid email');
-    })
+        expect(response.body).toHaveProperty('message', messages.INVALID_EMAIL);
+    });
+
+    // test('/api/users/test', async () => {
+    //     const response = await request(server).get('/api/users/test');
+    //     expect(response.status).toBe(200);
+    // })
 
 });
