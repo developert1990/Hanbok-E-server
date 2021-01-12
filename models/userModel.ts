@@ -1,4 +1,23 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { productsInfoType, productSchema } from './productModel';
+
+export interface userSchemaType extends Document {
+    name: string,
+    email: string,
+    password: string,
+    isAdmin: boolean,
+    isSeller: boolean,
+    cart: cartItemsType[],
+}
+
+export interface cartItemsType {
+    name: string,
+    image: string,
+    price: number,
+    countInStock: number,
+    product: string,
+    qty: number,
+}
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true, },
@@ -6,6 +25,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false, required: true },
     isSeller: { type: Boolean, default: false, required: true },
+    cart: [{ type: Object }]
 }, {
     timestamps: true
 });

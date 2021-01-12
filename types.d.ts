@@ -1,3 +1,4 @@
+import { productsInfoType } from './models/productModel';
 import { Document } from 'mongoose';
 import { Request } from 'express';
 
@@ -8,6 +9,7 @@ export interface userFromDB extends Document {
     email: string;
     isAdmin: boolean;
     isSeller: boolean;
+    cart: productsInfoType[],
     token: () => string;
 }
 

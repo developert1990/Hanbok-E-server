@@ -1,3 +1,5 @@
+import { userSchemaType, cartItemsType } from './../models/userModel';
+import { Product, productsInfoType } from './../models/productModel';
 import { CustomRequestExtendsUser } from './../types.d';
 import { isAuth, isAdmin } from './../utils';
 import express, { Request, Response } from 'express';
@@ -17,6 +19,9 @@ const userRouter = express.Router();
 //     res.send({ createdUsers });
 
 // }));
+
+
+// login 할때 cart item의 list 가져오는 API
 
 
 // user signin 하는 API
@@ -41,6 +46,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
         res.send({
             name: typedUser.name,
             email: typedUser.email,
+            cart: typedUser.cart,
         });
     } else {
         res.status(404).send(messages.INVALID_TOKEN);
@@ -50,14 +56,31 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 
 // check isAdmin
 userRouter.get('/checkAdmin', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
-    res.status(200).send({ message: "Amin user verified" })
+    res.status(200).send({ isAdmin: true })
 
 }));
 
 
-// // user signout
-userRouter.get('/signout', expressAsyncHandler(async (req: Request, res: Response) => {
-    console.log("signout 하러 옴")
+// // user signout 그리고 로그아웃할때 db에  local storage에 있는 제품 전부 저장한다.
+userRouter.put('/signout', isAuth, expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+    const userId = req.user;
+    const cartItems = req.body;
+    const typedCartItems = cartItems as cartItemsType[];
+    const user = await User.findById(userId);
+    const typedUser = user as userSchemaType;
+
+
+    if (typedCartItems.length !== 0) {
+        typedUser.cart = [];
+        typedCartItems.map((item) => {
+            typedUser.cart.push(item);
+        })
+        await typedUser.save();
+    } else {
+        typedUser.cart = [];
+        await typedUser.save();
+    }
+
     res.clearCookie(cookieName.HANBOK_COOKIE)
     res.status(200).send({ message: "Successfully logged out" })
 }))

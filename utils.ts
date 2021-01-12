@@ -89,7 +89,7 @@ export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: Next
                     next();
                 } else {
                     console.log("어드민 false")
-                    res.status(500).send({ message: "Amin verification is failed" })
+                    res.status(200).send({ isAdmin: false })
                 }
 
             }

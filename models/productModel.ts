@@ -30,7 +30,7 @@ const reviewSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const productSchema = new mongoose.Schema({
+export const productSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true, sparse: true },
     image: { type: String, required: true },
     brand: { type: String, required: true },
