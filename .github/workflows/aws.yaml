@@ -45,6 +45,8 @@ jobs:
         env:
           IMAGE: magicq6265/hanbok-server
           # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
-
+      - name:  Setting up NODE_ENV to production
+        run: 
+          export NODE_ENV=production      
 
           # git commit --allow-empty 아무것도 add 한거 없이 그냥 commit push 하고 싶을 때 사용 할 수 있는 명령어
