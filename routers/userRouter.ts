@@ -45,7 +45,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
-            domain: 'ec2-107-23-94-116.compute-1.amazonaws.com'
+            domain: process.env.NODE_ENV === "production" ? 'ec2-107-23-94-116.compute-1.amazonaws.com' : "localhost"
         });
         res.send({
             name: typedUser.name,
