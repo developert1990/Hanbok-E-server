@@ -10,6 +10,7 @@ import { userFromDB } from '../types';
 import { generateToken } from '../utils';
 import messages from '../constants/messages';
 import cookieName from '../constants/cookieName';
+import cookie from 'cookie';
 
 const userRouter = express.Router();
 
@@ -38,14 +39,19 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     if (!checkPassword) {
         return res.status(401).send({ message: messages.INVALID_PASSWORD });
     }
-    // domain: process.env.NODE_ENV === "production" ? "*.compute-1.amazonaws.com" : "localhost"
+
     const token = generateToken(typedUser);
     if (token) {
-        console.log("로그인 하는 부분 토큰 받아서 쿠키에 너으러 옴: ", process.env.NODE_ENV)
+        console.log("토큰 받아서 쿠키에 너으러 옴")
+
+        // res.setHeader('Set-Cookie', cookie.serialize('name', String(query.name), {
+        //     httpOnly: true,
+        //     maxAge: 60 * 60 * 24 * 7 // 1 week
+        // }));
+
         res.cookie(cookieName.HANBOK_COOKIE, token, {
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            httpOnly: true,
-            // domain: "*.compute-1.amazonaws.com"
+            maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
+            domain: 'ec2-107-23-94-116.compute-1.amazonaws.com'
         });
         res.send({
             name: typedUser.name,
