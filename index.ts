@@ -18,7 +18,7 @@ if (!process.env.MONGODB_URL) {
 }
 
 process.env.NODE_ENV = (process.env.NODE_ENV && (process.env.NODE_ENV).trim().toLowerCase() == 'production') ? 'production' : 'development';
-
+console.log('process.env.NODE_ENV ==> ', process.env.NODE_ENV)
 
 const corsOption = {
     origin: true,

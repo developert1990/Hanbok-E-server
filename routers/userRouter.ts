@@ -41,7 +41,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 
     const token = generateToken(typedUser);
     if (token) {
-        console.log("토큰 받아서 쿠키에 너으러 옴")
+        console.log("로그인 하는 부분 토큰 받아서 쿠키에 너으러 옴: ", process.env.NODE_ENV)
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
             domain: process.env.NODE_ENV === "production" ? ".compute-1.amazonaws.com" : "localhost"
