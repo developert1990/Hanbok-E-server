@@ -1,9 +1,13 @@
-
 import { CustomRequestExtendsUser } from './types';
 import { NextFunction, Request, Response } from 'express';
 import { userFromDB } from './types';
 import jwt from 'jsonwebtoken';
 import User from './models/userModel';
+import { DOMAIN } from './constants/names';
+import { IS_PROD } from './lib/utils';
+
+// 쿠키 도메인 설정
+export const getCookieDomain = () => IS_PROD ? DOMAIN.PROD : DOMAIN.DEV;
 
 
 export const generateToken = (user: userFromDB) => {

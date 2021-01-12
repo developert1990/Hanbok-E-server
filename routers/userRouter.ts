@@ -1,7 +1,7 @@
 import { userSchemaType, cartItemsType } from './../models/userModel';
 import { Product, productsInfoType } from './../models/productModel';
 import { CustomRequestExtendsUser } from './../types.d';
-import { isAuth, isAdmin } from './../utils';
+import { isAuth, isAdmin, getCookieDomain } from './../utils';
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel';
@@ -9,7 +9,7 @@ import expressAsyncHandler from 'express-async-handler'; // express에서 비동
 import { userFromDB } from '../types';
 import { generateToken } from '../utils';
 import messages from '../constants/messages';
-import cookieName from '../constants/cookieName';
+import cookieName from '../constants/names';
 
 const userRouter = express.Router();
 
@@ -45,7 +45,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
-            domain: process.env.NODE_ENV === "production" ? 'ec2-107-23-94-116.compute-1.amazonaws.com' : "localhost"
+            domain: getCookieDomain()
         });
         res.send({
             name: typedUser.name,

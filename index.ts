@@ -8,6 +8,7 @@ import orderRouter from './routers/orderRouter';
 import uploadRouter from './routers/uploadRouter';
 import emailRouter from './routers/sendEmailRouter';
 
+
 dotenv.config();
 
 // console.log(process.env);
@@ -17,7 +18,8 @@ if (!process.env.MONGODB_URL) {
     process.exit(1);
 }
 
-process.env.NODE_ENV = (process.env.NODE_ENV && (process.env.NODE_ENV).trim().toLowerCase() == 'production') ? 'production' : 'development';
+
+// process.env.NODE_ENV = (process.env.NODE_ENV && (process.env.NODE_ENV).trim().toLowerCase() == 'production') ? 'production' : 'development';
 console.log('process.env.NODE_ENV ==> ', process.env.NODE_ENV)
 
 const corsOption = {
