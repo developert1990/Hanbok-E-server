@@ -38,6 +38,7 @@ jobs:
       - name: Log into ec2 and deploy
           # git ubuntu 에 환경변수를 직접 박는거 ec2 로 넘겨줄 환경변수를 선언한다.
           # ssh aws 다음 env 
+          # 도커 컨테이너를 실행 시켜줄때 컨테이너에 환경변수 NODE_ENV 를 설정 함으로 써 해당 코드의 NODE_ENV 를 production으로 바꿔서 배포용으로 설정 해주었다.
         run: |
           export IMAGE_NAME=$IMAGE:${{ github.event.inputs.gitSha }}
           export CONTAINER_NAME=${{github.event.inputs.containerName}}
@@ -45,8 +46,5 @@ jobs:
         env:
           IMAGE: magicq6265/hanbok-server
           # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
-      - name:  Setting up NODE_ENV to production
-        run: 
-          export NODE_ENV=production      
 
           # git commit --allow-empty 아무것도 add 한거 없이 그냥 commit push 하고 싶을 때 사용 할 수 있는 명령어
