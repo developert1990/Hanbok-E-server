@@ -1,3 +1,4 @@
+import { userSchemaType } from './../models/userModel';
 import { CustomRequestExtendsUser } from './../types.d';
 import { productsInfoType } from './../models/productModel';
 import { isAuth, isAdmin } from './../utils';
@@ -6,6 +7,7 @@ import express, { Request, Response } from 'express';
 import { Product, Review } from '../models/productModel';
 import { data } from '../data';
 import { upload } from '../middlewares/s3Upload';
+import User from '../models/userModel';
 
 const productRouter = express.Router();
 
@@ -86,6 +88,7 @@ productRouter.get('/list/:name/:category/:priceLessThan/:sortBy', expressAsyncHa
 // }));
 
 
+
 // 찾기
 productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response) => {
     const product = await Product.findById(req.params.id);
@@ -95,6 +98,22 @@ productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response
         res.status(400).send({ message: 'Product Not Found' });
     }
 }))
+
+// 로그아웃할때 db에  local storage에 있는 제품 전부 저장한다.
+// productRouter.get('/addToCart/:id', isAuth,expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+//     const userId = req.user;
+//     const product = await Product.findById(req.params.id);
+//     const typedProduct = product as productsInfoType;
+//     if (!typedProduct) {
+//         res.status(400).send({ message: 'Product Not Found' });
+
+//     } else {
+//         const user = await User.findById(userId);
+//         const typedUser = user as userSchemaType;
+//         typedUser.cart.push(typedProduct)
+//             res.send(typedProduct);
+//     }
+// }))
 
 
 
