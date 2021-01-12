@@ -39,7 +39,7 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
         return stringToken;
     }, "")
 
-    const token = extractToken?.slice(17);
+    const token = extractToken?.slice(16); // 17에서 16으로 바꿈
     console.log('req.headers.cookie: ===>>> ', req.headers.cookie)
     console.log('token: ===>>> ', token)
     if (authorization) {
