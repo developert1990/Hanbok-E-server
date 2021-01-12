@@ -10,7 +10,6 @@ import { userFromDB } from '../types';
 import { generateToken } from '../utils';
 import messages from '../constants/messages';
 import cookieName from '../constants/cookieName';
-import cookie from 'cookie';
 
 const userRouter = express.Router();
 
