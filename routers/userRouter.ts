@@ -38,7 +38,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     if (!checkPassword) {
         return res.status(401).send({ message: messages.INVALID_PASSWORD });
     }
-
+    console.log('노드 환경 체크 ==>> ', process.env.NODE_ENV)
     const token = generateToken(typedUser);
     if (token) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
