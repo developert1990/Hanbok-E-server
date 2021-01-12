@@ -44,11 +44,6 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     if (token) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
 
-        // res.setHeader('Set-Cookie', cookie.serialize('name', String(query.name), {
-        //     httpOnly: true,
-        //     maxAge: 60 * 60 * 24 * 7 // 1 week
-        // }));
-
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
             domain: 'ec2-107-23-94-116.compute-1.amazonaws.com'
