@@ -40,7 +40,8 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
     }, "")
 
     const token = extractToken?.slice(17);
-
+    console.log('req.headers.cookie: ===>>> ', req.headers.cookie)
+    console.log('token: ===>>> ', token)
     if (authorization) {
         jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
             if (err) {
