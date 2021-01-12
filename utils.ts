@@ -73,7 +73,7 @@ export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: Next
         return stringToken;
     }, "")
 
-    const token = extractToken?.slice(17);
+    const token = extractToken?.slice(16); // 이부분도 17에서 바꿔줌
 
     // console.log('토큰뽑기: ', token)
 
