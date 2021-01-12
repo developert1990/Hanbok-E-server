@@ -84,7 +84,6 @@ export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: Next
             } else {
 
                 const typedDecod = decode as decodeType
-                console.log('typedDecod: ', typedDecod)
                 if (typedDecod.isAdmin) {
                     console.log("어드민 true")
                     next();
