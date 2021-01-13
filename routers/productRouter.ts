@@ -8,6 +8,7 @@ import { Product, Review } from '../models/productModel';
 import { data } from '../data';
 import { upload } from '../middlewares/s3Upload';
 import User from '../models/userModel';
+import { deleteFile } from '../middlewares/s3Delete';
 
 const productRouter = express.Router();
 
@@ -99,22 +100,6 @@ productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response
     }
 }))
 
-// 로그아웃할때 db에  local storage에 있는 제품 전부 저장한다.
-// productRouter.get('/addToCart/:id', isAuth,expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
-//     const userId = req.user;
-//     const product = await Product.findById(req.params.id);
-//     const typedProduct = product as productsInfoType;
-//     if (!typedProduct) {
-//         res.status(400).send({ message: 'Product Not Found' });
-
-//     } else {
-//         const user = await User.findById(userId);
-//         const typedUser = user as userSchemaType;
-//         typedUser.cart.push(typedProduct)
-//             res.send(typedProduct);
-//     }
-// }))
-
 
 
 
@@ -122,7 +107,7 @@ productRouter.get('/:id', expressAsyncHandler(async (req: Request, res: Response
 productRouter.post('/admin/create', isAdmin, upload, expressAsyncHandler(async (req, res) => {
     console.log("admin확인 되서 들어옴")
     //s3 upload -> get URL
-    console.log(req.file);
+    console.log("리퀘파일 : ", req.file);
     console.log('req.body: ', req.body)
     console.log("폼: ", req.body.formData);
     // const { createProduct } = JSON.parse(req.body);
@@ -133,6 +118,8 @@ productRouter.post('/admin/create', isAdmin, upload, expressAsyncHandler(async (
         name,
         // @ts-ignore
         image: req.file.location, // s3 URL
+        // @ts-ignore
+        imageKey: req.file.key,
         price,
         category,
         brand,
@@ -178,11 +165,14 @@ productRouter.put('/admin/update/:id', isAdmin, expressAsyncHandler(async (req: 
 // Admin계정으로 product delete 하는 API
 productRouter.delete('/admin/:id', isAdmin, expressAsyncHandler(async (req: Request, res: Response) => {
     const product = await Product.findById(req.params.id);
-    if (product) {
-        const deletedProduct = await product.remove();
-        res.send({ message: 'Product Deleted', product: deletedProduct });
-    } else {
+    const typedProduct = product as productsInfoType
+    deleteFile(typedProduct.imageKey);
+    if (!product) {
         res.status(404).send({ message: 'Product Not Found' });
+    } else {
+        const deletedProduct = await product.remove();
+        deleteFile(typedProduct.imageKey);
+        res.send({ message: 'Product Deleted', product: deletedProduct });
     }
 }));
 

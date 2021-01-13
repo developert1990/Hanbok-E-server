@@ -5,6 +5,7 @@ import mongoose, { Document } from 'mongoose';
 export interface productsInfoType extends Document {
     name: string;
     image: string;
+    imageKey: string;
     brand: string;
     category: string;
     description: string;
@@ -33,6 +34,7 @@ const reviewSchema = new mongoose.Schema({
 export const productSchema = new mongoose.Schema({
     name: { type: String, required: true, unique: true, sparse: true },
     image: { type: String, required: true },
+    imageKey: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },
     description: { type: String, required: true },

@@ -23,7 +23,21 @@ const userRouter = express.Router();
 
 // login 할때 cart item의 list 가져오는 API
 
+// 못하면 뒤짐
+// 1. ㄹ로그인 하면 토큰과 리프레시 토큰 둘다 발급 (토큰 10분 레프레시토큰 하루)
+// 2. 둘다 프론트에서 쿠키에 저장
+// 3. 프론트에서 매분 또는 30초마다 토큰 남온시간 확인
+// 4. 유효기간 얼마 안남았을때 모달 띄워서 세션 연장할건지 유저에게 물음
+// 4.1 유저가 확인 눌른 시간이 아직 유효기간 만료 전이면 리프레시 토큰 서버에 보내서 새로운 토큰 발급받아 쿠키에 저장
+// 4.2 유저가 토큰 유효기간 만료후에 확인을 눌렀을때 로그아웃후 로그인화면으로 리다이렉트트
 
+userRouter.get('/refreshSession', expressAsyncHandler(async (req, res) => {
+    // verify refresh token - if it's still valid make a new token and set it to res.cookie
+    // res.cookie()
+}));
+
+// 프론트에서 시간 체크를 해서 토큰 만료기간 이전에 refresh를 누르면 그냥 refresh 토큰 사용하고 만료기간 이후에 누르면 새로 login 하는 쪽으로 redirect시킨다.
+// refresh 토큰 하나 더 같이 발급  좀더 긴거..하루 이틀 짜리
 // user signin 하는 API
 userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Response) => {
     const user = await User.findOne({ email: req.body.email });
@@ -40,11 +54,13 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     }
     console.log('노드 환경 체크 ==>> ', process.env.NODE_ENV)
     const token = generateToken(typedUser);
+    //const refreshToken = generateToken(typedUser, '24h');
     if (token) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
 
         res.cookie(cookieName.HANBOK_COOKIE, token, {
-            maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
+            // maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
+            maxAge: 1000 * 60, httpOnly: true,
             domain: getCookieDomain()
         });
         res.send({

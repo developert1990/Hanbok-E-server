@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "nodemon build/index.js",
     "test": "jest --forceExit --watch",
     "build": "tsc",
     "dev": "bash /scripts/dev.sh"

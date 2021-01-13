@@ -10,7 +10,7 @@ import { IS_PROD } from './lib/utils';
 export const getCookieDomain = () => IS_PROD ? DOMAIN.PROD : DOMAIN.DEV;
 
 
-export const generateToken = (user: userFromDB) => {
+export const generateToken = (user: userFromDB, expiresIn = '15m') => {
     console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
     return jwt.sign({
         _id: user._id,
@@ -18,7 +18,7 @@ export const generateToken = (user: userFromDB) => {
         email: user.email,
         isAdmin: user.isAdmin,
     }, process.env.JWT_SECRET as string, {
-        expiresIn: '24h',
+        expiresIn,
     });
 }
 
