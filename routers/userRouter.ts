@@ -54,15 +54,24 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     }
     console.log('노드 환경 체크 ==>> ', process.env.NODE_ENV)
     const token = generateToken(typedUser);
-    //const refreshToken = generateToken(typedUser, '24h');
-    if (token) {
+    const refreshToken = generateToken(typedUser, '10m');
+
+    if (token && refreshToken) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
 
+        // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             // maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
-            maxAge: 1000 * 60, httpOnly: true,
+            maxAge: 1000 * 300, httpOnly: true,
             domain: getCookieDomain()
         });
+
+        // 조금 긴 만료기간을 가진 refresh 토큰 쿠키에 저장
+        res.cookie(cookieName.HANBOK_COOKIE_REFRESH, refreshToken, {
+            maxAge: 1000 * 600, httpOnly: true,
+            domain: getCookieDomain()
+        })
+
         res.send({
             name: typedUser.name,
             email: typedUser.email,
