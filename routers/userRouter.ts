@@ -1,7 +1,7 @@
 import { userSchemaType, cartItemsType } from './../models/userModel';
 import { Product, productsInfoType } from './../models/productModel';
 import { CustomRequestExtendsUser } from './../types.d';
-import { isAuth, isAdmin, getCookieDomain } from './../utils';
+import { isAuth, isAdmin, getCookieDomain, decodeType } from './../utils';
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel';
@@ -10,6 +10,8 @@ import { userFromDB } from '../types';
 import { generateToken } from '../utils';
 import messages from '../constants/messages';
 import cookieName from '../constants/names';
+import cookie from 'cookie';
+import jwt from 'jsonwebtoken';
 
 const userRouter = express.Router();
 
@@ -36,6 +38,36 @@ userRouter.get('/refreshSession', expressAsyncHandler(async (req, res) => {
     // res.cookie()
 }));
 
+userRouter.get('/checkCookieExpiration', expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+    const cookies = cookie.parse(req.headers.cookie as string);
+    // console.log('cookies: ', cookies)
+    const token = cookies.hanbok_my_token;
+
+    if (cookies) {
+        jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
+            if (err) {
+                res.status(401).send({ message: 'Invalid Token' });
+            } else {
+                const now = Math.floor(new Date().getTime() / 1000.0)
+                console.log('decode: ', decode)
+                console.log('현재시간', now)
+                const { _id, name, exp } = decode as decodeType;
+                console.log('타임체크: ', (exp - now)) // 초로 계산된다. 10분 남았으면 600초, 20분 남았으면 1200초
+                const remainCookieExpiration = exp - now
+                req.user = _id;
+                req.name = name;
+                if (remainCookieExpiration >= 600) {
+                    res.status(200).send({ shouldGetNew: false, remainingTime: remainCookieExpiration / 60 });
+                } else {
+                    res.status(200).send({ shouldGetNew: true, remainingTime: remainCookieExpiration / 60 });
+                }
+            }
+        });
+    } else {
+        res.status(401).send({ message: 'No Token' });
+    }
+}))
+
 // 프론트에서 시간 체크를 해서 토큰 만료기간 이전에 refresh를 누르면 그냥 refresh 토큰 사용하고 만료기간 이후에 누르면 새로 login 하는 쪽으로 redirect시킨다.
 // refresh 토큰 하나 더 같이 발급  좀더 긴거..하루 이틀 짜리
 // user signin 하는 API
@@ -54,7 +86,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
     }
     console.log('노드 환경 체크 ==>> ', process.env.NODE_ENV)
     const token = generateToken(typedUser);
-    const refreshToken = generateToken(typedUser, '10m');
+    const refreshToken = generateToken(typedUser, '2h');
 
     if (token && refreshToken) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
@@ -62,13 +94,13 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
         // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
         res.cookie(cookieName.HANBOK_COOKIE, token, {
             // maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
-            maxAge: 1000 * 300, httpOnly: true,
+            maxAge: 1000 * 60 * 60, httpOnly: true,
             domain: getCookieDomain()
         });
 
         // 조금 긴 만료기간을 가진 refresh 토큰 쿠키에 저장
         res.cookie(cookieName.HANBOK_COOKIE_REFRESH, refreshToken, {
-            maxAge: 1000 * 600, httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 2, httpOnly: true,
             domain: getCookieDomain()
         })
 

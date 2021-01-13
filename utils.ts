@@ -10,7 +10,7 @@ import cookie from 'cookie';
 export const getCookieDomain = () => IS_PROD ? DOMAIN.PROD : DOMAIN.DEV;
 
 
-export const generateToken = (user: userFromDB, expiresIn = '5m') => {
+export const generateToken = (user: userFromDB, expiresIn = '1h') => {
     console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
     return jwt.sign({
         _id: user._id,
@@ -36,7 +36,6 @@ export interface decodeType {
 export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
 
     const cookies = cookie.parse(req.headers.cookie as string);
-    console.log('cookies: ', cookies)
     const token = cookies.hanbok_my_token;
 
     if (cookies) {
@@ -45,6 +44,7 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
                 res.status(401).send({ message: 'Invalid Token' });
             } else {
                 const { _id, name } = decode as decodeType;
+
                 req.user = _id;
                 req.name = name;
                 next();
@@ -61,7 +61,7 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
 // amin계정으로 접속했을 경우에 admin관리를 할 수 있는 페이지에서 동작하는 API를 verify 해주기 위한 middleware
 export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
     const cookies = cookie.parse(req.headers.cookie as string);
-    console.log('cookies: ', cookies)
+    // console.log('cookies: ', cookies)
     const token = cookies.hanbok_my_token;
 
     if (cookies) {
