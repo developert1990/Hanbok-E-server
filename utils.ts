@@ -2,15 +2,15 @@ import { CustomRequestExtendsUser } from './types';
 import { NextFunction, Request, Response } from 'express';
 import { userFromDB } from './types';
 import jwt from 'jsonwebtoken';
-import User from './models/userModel';
 import { DOMAIN } from './constants/names';
 import { IS_PROD } from './lib/utils';
+import cookie from 'cookie';
 
 // 쿠키 도메인 설정
 export const getCookieDomain = () => IS_PROD ? DOMAIN.PROD : DOMAIN.DEV;
 
 
-export const generateToken = (user: userFromDB, expiresIn = '15m') => {
+export const generateToken = (user: userFromDB, expiresIn = '5m') => {
     console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
     return jwt.sign({
         _id: user._id,
@@ -34,19 +34,12 @@ export interface decodeType {
 
 // 계정으로 접속 햇을 때 API를 사용하기 위해 verify 하는 middleware.
 export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
-    const authorization = req.headers.cookie;
-    const extractToken = authorization?.split(';').reduce((a, c) => {
-        let stringToken = "";
-        if (c.includes("hanbok_my_token")) {
-            stringToken = c;
-        }
-        return stringToken;
-    }, "")
 
-    const token = extractToken?.slice(16); // 17에서 16으로 바꿈
-    console.log('req.headers.cookie: ===>>> ', req.headers.cookie)
-    console.log('token: ===>>> ', token)
-    if (authorization) {
+    const cookies = cookie.parse(req.headers.cookie as string);
+    console.log('cookies: ', cookies)
+    const token = cookies.hanbok_my_token;
+
+    if (cookies) {
         jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
@@ -65,23 +58,13 @@ export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextF
 
 
 
-
 // amin계정으로 접속했을 경우에 admin관리를 할 수 있는 페이지에서 동작하는 API를 verify 해주기 위한 middleware
 export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
-    const authorization = req.headers.cookie;
-    const extractToken = authorization?.split(';').reduce((a, c) => {
-        let stringToken = "";
-        if (c.includes("hanbok_my_token")) {
-            stringToken = c;
-        }
-        return stringToken;
-    }, "")
+    const cookies = cookie.parse(req.headers.cookie as string);
+    console.log('cookies: ', cookies)
+    const token = cookies.hanbok_my_token;
 
-    const token = extractToken?.slice(16); // 이부분도 17에서 바꿔줌
-
-    // console.log('토큰뽑기: ', token)
-
-    if (authorization) {
+    if (cookies) {
         jwt.verify(token as string, process.env.JWT_SECRET as string, async (err, decode) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
