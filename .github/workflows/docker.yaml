@@ -40,6 +40,7 @@ jobs:
           EMAIL: ${{secrets.EMAIL}}
           EMAIL_PASSWORD: ${{secrets.EMAIL_PASSWORD}}
           MONGODB_URL: ${{secrets.MONGODB_URL}}
+          COOKIE_DOMAIN_PROD: ${{secrets.COOKIE_DOMAIN_PROD}}
 
       - name: Building docker image
         run: make build

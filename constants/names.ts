@@ -6,7 +6,9 @@ export const COOKIENAME = {
 }
 
 export const DOMAIN = {
-    PROD: 'ec2-107-23-94-116.compute-1.amazonaws.com',
+    // PROD: 'ec2-3-80-79-7.compute-1.amazonaws.com',
+    // DEV: "localhost",
+    PROD: process.env.COOKIE_DOMAIN_PROD,
     DEV: "localhost",
 }
 
