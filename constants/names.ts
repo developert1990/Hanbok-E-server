@@ -8,7 +8,7 @@ export const COOKIENAME = {
 export const DOMAIN = {
     // PROD: 'ec2-3-80-79-7.compute-1.amazonaws.com',
     // DEV: "localhost",
-    PROD: process.env.COOKIE_DOMAIN_PROD,
+    PROD: process.env.COOKIE_DOMAIN_PROD,  // 여기서 도메인은 EC2의 Public IPv4 DNS 값이다.(ex => ec2-3-80-79-7.compute-1.amazonaws.com)
     DEV: "localhost",
 }
 
