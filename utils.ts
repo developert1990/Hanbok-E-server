@@ -2,7 +2,7 @@ import { CustomRequestExtendsUser } from './types';
 import { NextFunction, Request, Response } from 'express';
 import { userFromDB } from './types';
 import jwt from 'jsonwebtoken';
-import { DOMAIN } from './constants/names';
+import { DOMAIN, COOKIE_EXP, COOKIENAME } from './constants/names';
 import { IS_PROD } from './lib/utils';
 import cookie from 'cookie';
 
@@ -10,7 +10,7 @@ import cookie from 'cookie';
 export const getCookieDomain = () => IS_PROD ? DOMAIN.PROD : DOMAIN.DEV;
 
 
-export const generateToken = (user: userFromDB, expiresIn = '1h') => {
+export const generateToken = async (user: userFromDB, expiresIn = COOKIE_EXP.REGULAR_TOKEN_EXP) => {
     console.log('process.env.JWT_SECRET', process.env.JWT_SECRET)
     return jwt.sign({
         _id: user._id,
@@ -20,6 +20,28 @@ export const generateToken = (user: userFromDB, expiresIn = '1h') => {
     }, process.env.JWT_SECRET as string, {
         expiresIn,
     });
+}
+
+export const checkTokenEXP = async (token: string) => {
+    console.log('넘어온 token', token)
+    let tokenExp;
+    if (!token) {
+        return "can not check token exp"
+    }
+    jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
+        if (err) {
+            return `got an err : ${err}`
+        } else {
+            const now = Math.floor(new Date().getTime() / 1000.0)
+            console.log('decode: ', decode)
+            console.log('현재시간', now)
+            const { _id, name, exp } = decode as decodeType;
+            console.log('타임체크: ', (exp - now)) // 초로 계산된다. 10분 남았으면 600초, 20분 남았으면 1200초
+            // const remainCookieExpiration = exp - now
+            tokenExp = exp
+        };
+    })
+    return tokenExp;
 }
 
 export interface decodeType {
@@ -36,15 +58,15 @@ export interface decodeType {
 export const isAuth = (req: CustomRequestExtendsUser, res: Response, next: NextFunction) => {
 
     const cookies = cookie.parse(req.headers.cookie as string);
-    const token = cookies.hanbok_my_token;
+    const token = cookies[COOKIENAME.HANBOK_COOKIE];
+    const refreshToken = cookies[COOKIENAME.HANBOK_COOKIE_REFRESH]
 
-    if (cookies) {
-        jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
+    if (token || refreshToken) {
+        jwt.verify(token || refreshToken, process.env.JWT_SECRET as string, (err, decode) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
             } else {
                 const { _id, name } = decode as decodeType;
-
                 req.user = _id;
                 req.name = name;
                 next();
@@ -82,7 +104,7 @@ export const isAdmin = (req: CustomRequestExtendsUser, res: Response, next: Next
             }
         });
     } else {
-        res.status(401).send({ message: 'No cookie passed from browser' });
+        res.status(401).send({ message: 'No Token' });
     }
 }
 

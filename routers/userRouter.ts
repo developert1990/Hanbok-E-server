@@ -1,7 +1,7 @@
+import { COOKIE_EXP } from './../constants/names';
 import { userSchemaType, cartItemsType } from './../models/userModel';
-import { Product, productsInfoType } from './../models/productModel';
 import { CustomRequestExtendsUser } from './../types.d';
-import { isAuth, isAdmin, getCookieDomain, decodeType } from './../utils';
+import { isAuth, isAdmin, getCookieDomain, decodeType, checkTokenEXP } from './../utils';
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/userModel';
@@ -9,7 +9,7 @@ import expressAsyncHandler from 'express-async-handler'; // express에서 비동
 import { userFromDB } from '../types';
 import { generateToken } from '../utils';
 import messages from '../constants/messages';
-import cookieName from '../constants/names';
+import { COOKIENAME } from '../constants/names';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 
@@ -33,40 +33,51 @@ const userRouter = express.Router();
 // 4.1 유저가 확인 눌른 시간이 아직 유효기간 만료 전이면 리프레시 토큰 서버에 보내서 새로운 토큰 발급받아 쿠키에 저장
 // 4.2 유저가 토큰 유효기간 만료후에 확인을 눌렀을때 로그아웃후 로그인화면으로 리다이렉트트
 
-userRouter.get('/refreshSession', expressAsyncHandler(async (req, res) => {
-    // verify refresh token - if it's still valid make a new token and set it to res.cookie
-    // res.cookie()
-}));
 
-userRouter.get('/checkCookieExpiration', expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
-    const cookies = cookie.parse(req.headers.cookie as string);
+
+userRouter.get('/refreshSession', expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+    if (!req.headers?.cookie) {
+        console.log("쿠키 없어서 튕김")
+        res.status(200).send({ message: "need Re-login " });
+    }
     // console.log('cookies: ', cookies)
+    const cookies = cookie.parse(req.headers?.cookie as string);
     const token = cookies.hanbok_my_token;
-
-    if (cookies) {
-        jwt.verify(token as string, process.env.JWT_SECRET as string, (err, decode) => {
+    const refreshToken = cookies.hanbok_refresh_token;
+    if (token || refreshToken) {
+        jwt.verify(token as string || refreshToken as string, process.env.JWT_SECRET as string, async (err, decode) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
             } else {
-                const now = Math.floor(new Date().getTime() / 1000.0)
-                console.log('decode: ', decode)
-                console.log('현재시간', now)
-                const { _id, name, exp } = decode as decodeType;
-                console.log('타임체크: ', (exp - now)) // 초로 계산된다. 10분 남았으면 600초, 20분 남았으면 1200초
-                const remainCookieExpiration = exp - now
-                req.user = _id;
-                req.name = name;
-                if (remainCookieExpiration >= 600) {
-                    res.status(200).send({ shouldGetNew: false, remainingTime: remainCookieExpiration / 60 });
-                } else {
-                    res.status(200).send({ shouldGetNew: true, remainingTime: remainCookieExpiration / 60 });
-                }
+
+                const { _id, name, email, exp } = decode as decodeType;
+                const user = await User.findOne({ email });
+                const typedUser = user as userFromDB;
+                const newToken = await generateToken(typedUser);
+                const newTokenExp = await checkTokenEXP(newToken); //  만료시간 계산 단, 리프레시 요청을 만료시간 전에 물어보는데 만료가 된다음 refresh 버튼을 눌렀을 경우에 hanbok_my_token은 존재하지 않는다 그렇기 때문에 이러한 상황에서는 refreshToken을 가지고 hanbok_my_token을 재발급해준다.
+                // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
+                res.cookie(COOKIENAME.HANBOK_COOKIE, newToken, {
+                    maxAge: COOKIE_EXP.REGULAR_TOKEN_EXP, httpOnly: true,
+                    domain: getCookieDomain()
+                });
+                res.send({
+                    name: typedUser.name,
+                    email: typedUser.email,
+                    cart: typedUser.cart,
+                    tokenExp: newTokenExp,
+                });
             }
         });
     } else {
-        res.status(401).send({ message: 'No Token' });
+        res.status(200).send({ message: "need Re-login " });
     }
 }))
+
+
+
+
+
+
 
 // 프론트에서 시간 체크를 해서 토큰 만료기간 이전에 refresh를 누르면 그냥 refresh 토큰 사용하고 만료기간 이후에 누르면 새로 login 하는 쪽으로 redirect시킨다.
 // refresh 토큰 하나 더 같이 발급  좀더 긴거..하루 이틀 짜리
@@ -85,29 +96,36 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
         return res.status(401).send({ message: messages.INVALID_PASSWORD });
     }
     console.log('노드 환경 체크 ==>> ', process.env.NODE_ENV)
-    const token = generateToken(typedUser);
-    const refreshToken = generateToken(typedUser, '2h');
+    const token = await generateToken(typedUser);
+    const refreshToken = await generateToken(typedUser, COOKIE_EXP.REFRESH_TOKEN_EXP);
+
+    const tokenExp = await checkTokenEXP(token); //  만료시간 계산
+    const refreshTokenExp = await checkTokenEXP(refreshToken);
+    console.log('tokenExp:  ===>>> ', tokenExp)
+    console.log('refreshTokenExp', refreshTokenExp)
 
     if (token && refreshToken) {
         console.log("토큰 받아서 쿠키에 너으러 옴")
 
         // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
-        res.cookie(cookieName.HANBOK_COOKIE, token, {
+        res.cookie(COOKIENAME.HANBOK_COOKIE, token, {
             // maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true,
-            maxAge: 1000 * 60 * 60, httpOnly: true,
+            maxAge: COOKIE_EXP.REGULAR_TOKEN_EXP, httpOnly: true,
             domain: getCookieDomain()
         });
 
         // 조금 긴 만료기간을 가진 refresh 토큰 쿠키에 저장
-        res.cookie(cookieName.HANBOK_COOKIE_REFRESH, refreshToken, {
-            maxAge: 1000 * 60 * 60 * 2, httpOnly: true,
+        res.cookie(COOKIENAME.HANBOK_COOKIE_REFRESH, refreshToken, {
+            maxAge: COOKIE_EXP.REFRESH_TOKEN_EXP, httpOnly: true,
             domain: getCookieDomain()
         })
-
+        console.log('tokenExp====>>> ??? ', tokenExp)
         res.send({
             name: typedUser.name,
             email: typedUser.email,
             cart: typedUser.cart,
+            tokenExp: tokenExp,
+            refreshTokenExp: refreshTokenExp,
         });
     } else {
         res.status(404).send(messages.INVALID_TOKEN);
@@ -142,7 +160,8 @@ userRouter.put('/signout', isAuth, expressAsyncHandler(async (req: CustomRequest
         await typedUser.save();
     }
 
-    res.clearCookie(cookieName.HANBOK_COOKIE)
+    res.clearCookie(COOKIENAME.HANBOK_COOKIE)
+    res.clearCookie(COOKIENAME.HANBOK_COOKIE_REFRESH)
     res.status(200).send({ message: "Successfully logged out" })
 }))
 
@@ -161,7 +180,7 @@ userRouter.post('/register', expressAsyncHandler(async (req: Request, res: Respo
     const typedUser = createdUser as userFromDB;
     const token = generateToken(typedUser);
     if (token) {
-        res.cookie(cookieName.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+        res.cookie(COOKIENAME.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
     } else {
         res.status(404).send("Invalid token..");
     }
@@ -189,7 +208,7 @@ userRouter.put('/update', isAuth, expressAsyncHandler(async (req: CustomRequestE
         const token = generateToken(updatedUser);
         if (token) {
             console.log("토큰 받아서 쿠키에 너으러 옴")
-            res.cookie(cookieName.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
+            res.cookie(COOKIENAME.HANBOK_COOKIE, token, { maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
         } else {
             res.status(404).send("Invalid token..");
         }
@@ -259,3 +278,25 @@ userRouter.put('/admin/update/:id', isAdmin, expressAsyncHandler(async (req: Req
 }))
 
 export default userRouter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
