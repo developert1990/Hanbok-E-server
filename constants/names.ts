@@ -13,7 +13,7 @@ export const DOMAIN = {
 }
 
 export const COOKIE_EXP = {
-    REGULAR_TOKEN_EXP: "5m", // 5분
+    REGULAR_TOKEN_EXP: "1m", // 5분
     // REFRESH_TOKEN_EXP: 1000 * 60 * 60 * 2, // 2시간
-    REFRESH_TOKEN_EXP: "30m", // 30분
+    REFRESH_TOKEN_EXP: "2m", // 30분
 }

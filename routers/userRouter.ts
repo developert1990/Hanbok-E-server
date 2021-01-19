@@ -36,6 +36,7 @@ const userRouter = express.Router();
 
 
 userRouter.get('/refreshSession', expressAsyncHandler(async (req: CustomRequestExtendsUser, res: Response) => {
+    console.log("체크하러옴")
     if (!req.headers?.cookie) {
         console.log("쿠키 없어서 튕김")
         res.status(200).send({ message: "need Re-login " });
@@ -57,7 +58,7 @@ userRouter.get('/refreshSession', expressAsyncHandler(async (req: CustomRequestE
                 const newTokenExp = await checkTokenEXP(newToken); //  만료시간 계산 단, 리프레시 요청을 만료시간 전에 물어보는데 만료가 된다음 refresh 버튼을 눌렀을 경우에 hanbok_my_token은 존재하지 않는다 그렇기 때문에 이러한 상황에서는 refreshToken을 가지고 hanbok_my_token을 재발급해준다.
                 // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
                 res.cookie(COOKIENAME.HANBOK_COOKIE, newToken, {
-                    maxAge: 1000 * 60 * 60, httpOnly: true,
+                    maxAge: 1000 * 60 * 1, httpOnly: true,
                     domain: getCookieDomain()
                 });
                 res.send({
@@ -109,13 +110,13 @@ userRouter.post('/signin', expressAsyncHandler(async (req: Request, res: Respons
 
         // 짧은 만료기간을 가진 일반 토큰 쿠키에 저장 
         res.cookie(COOKIENAME.HANBOK_COOKIE, token, {
-            maxAge: 1000 * 60 * 5, httpOnly: true, // 5 분
+            maxAge: 1000 * 60 * 1, httpOnly: true, // 5 분
             domain: getCookieDomain()
         });
 
         // 조금 긴 만료기간을 가진 refresh 토큰 쿠키에 저장
         res.cookie(COOKIENAME.HANBOK_COOKIE_REFRESH, refreshToken, {
-            maxAge: 1000 * 60 * 30, httpOnly: true, // 30 분
+            maxAge: 1000 * 60 * 2, httpOnly: true, // 30 분
             domain: getCookieDomain()
         })
         console.log('tokenExp====>>> ??? ', tokenExp)

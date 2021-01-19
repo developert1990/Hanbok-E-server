@@ -19,6 +19,8 @@ jobs:
         uses: actions/checkout@v2 # git clone 하는 action 예를 들어서 npm 에서 install 하는거랑 비슷
 
       - name: Setting up SSH
+      # 26번째줄 - SSH_KEY를 받아와서 .ssh 디렉토리 아래에 ec2.key 에 넣어줫다. 이 키(public key)는 ssh ec2 server에 저장해서 이곳으로 접속을 시도하는 내 로컬의 키(private key)와 비교를해서 퍼즐과같이 맞아떨어지면 접속을 허용하게 된다. 
+      # 27번째줄 - 해당 ec2.key 파일의 권한을 600으로 주었다. 그래야 읽을 수가 있다 고 한다.
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/ec2.key
