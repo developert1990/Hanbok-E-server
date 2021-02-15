@@ -277,6 +277,12 @@ userRouter.put('/admin/update/:id', isAdmin, expressAsyncHandler(async (req: Req
     }
 }))
 
+
+userRouter.get('/test', (req, res) => {
+    console.log('환경변수!!!: ', process.env.JWT_SECRET)
+    res.send("working well...")
+})
+
 export default userRouter;
 
 

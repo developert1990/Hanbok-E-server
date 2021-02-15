@@ -34,7 +34,7 @@ jobs:
           END
           cat ~/.ssh/config
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }} # 이건  local에 있는 aws_ec2_hong.pem 파일의 안에 내용값이다. 아마존ec2에서 받은 private ssh 키 값
+          SSH_KEY: ${{ secrets.SSH_KEY }} # 이건  local에 있는 aws_ec2_sangmean.pem 파일의 안에 내용값이다. 아마존ec2에서 받은 private ssh 키 값
           SSH_HOST: ${{ secrets.SSH_HOST }} # ec2에 public PIv4 address 이다.
 
       - name: Log into ec2 and deploy
